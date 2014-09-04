@@ -11,4 +11,8 @@ class UiController < ApplicationController
   def home
     @videos = Video.all
   end
+
+  def video
+    @video = Video.first
+  end
 end
