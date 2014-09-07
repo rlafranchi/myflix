@@ -8,4 +8,11 @@ describe Category do
   end
 
   it {should have_many(:videos)}
+
+  describe "#recent_videos" do
+    it "returns array of videos ordered by created at"
+    it "returns all videos if there are less than six videos"
+    it "returns six videos if there are six or more"
+    it "returns empyt array if no videos"
+  end
 end
