@@ -6,8 +6,11 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+cat = Category.find_by(name: "Comedies")
 # Video.create(name: 'Monk', description: 'OCD', small_image_url: '/tmp/monk.jpg', large_image_url: '/tmp/monk_large.jpg')
-# Video.create(name: 'Family Guy', description: 'Comdey', small_image_url: '/tmp/family_guy.jpg')
-# Video.create(name: 'South Park', description: 'Colorado', small_image_url: '/tmp/south_park.jpg')
-Category.create(name: 'Comedies')
-Category.create(name: 'Dramas')
+6.times do
+  Video.create(name: 'Family Guy', description: 'Comdey', small_image_url: '/tmp/family_guy.jpg', categories: [cat], created_at: 1.day.ago)
+  Video.create(name: 'South Park', description: 'Colorado', small_image_url: '/tmp/south_park.jpg', categories: [cat])
+end
+# Category.create(name: 'Comedies')
+# Category.create(name: 'Dramas')
