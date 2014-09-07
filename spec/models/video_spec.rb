@@ -8,4 +8,32 @@ describe Video do
   it {should have_many(:categories)}
   it {should validate_presence_of(:name)}
   it {should validate_presence_of(:description)}
+
+  describe "search_by_name" do
+    it "returns empty array if no match" do
+      futurama = Video.create(name: "Futurama", description: "Space travel")
+      back_to_future = Video.create(name: "Back to the Future", description: "time travel")
+      expect(Video.search_by_name("hello")).to eq([])
+    end
+    it "returns an array of one video for an exact match" do
+      futurama = Video.create(name: "Futurama", description: "Space travel")
+      back_to_future = Video.create(name: "Back to the Future", description: "time travel")
+      expect(Video.search_by_name("Futurama")).to eq([futurama])
+    end
+    it "returns array of one video for a partial match" do
+      futurama = Video.create(name: "Futurama", description: "Space travel")
+      back_to_future = Video.create(name: "Back to the Future", description: "time travel")
+      expect(Video.search_by_name("urama")).to eq([futurama])
+    end
+    it "returns array of multiple vidoes for multiple matches" do
+      futurama = Video.create(name: "Futurama", description: "Space travel")
+      back_to_future = Video.create(name: "Back to the Future", description: "time travel", created_at: 1.day.ago)
+      expect(Video.search_by_name("Futur")).to eq([futurama, back_to_future])
+    end
+    it "searches for empy string" do
+      futurama = Video.create(name: "Futurama", description: "Space travel")
+      back_to_future = Video.create(name: "Back to the Future", description: "time travel", created_at: 1.day.ago)
+      expect(Video.search_by_name("")).to eq([])
+    end
+  end
 end
