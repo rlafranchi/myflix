@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   def new
-
+    redirect_to videos_path if current_user
   end
 
   def create
