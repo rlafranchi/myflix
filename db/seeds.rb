@@ -8,9 +8,18 @@
 
 cat = Category.find_by(name: "Comedies")
 # Video.create(name: 'Monk', description: 'OCD', small_image_url: '/tmp/monk.jpg', large_image_url: '/tmp/monk_large.jpg')
-6.times do
-  Video.create(name: 'Family Guy', description: 'Comdey', small_image_url: '/tmp/family_guy.jpg', categories: [cat], created_at: 1.day.ago)
-  Video.create(name: 'South Park', description: 'Colorado', small_image_url: '/tmp/south_park.jpg', categories: [cat])
-end
+#6.times do
+#  Video.create(name: 'Family Guy', description: 'Comdey', small_image_url: '/tmp/family_guy.jpg', categories: [cat], created_at: 1.day.ago)
+#  Video.create(name: 'South Park', description: 'Colorado', small_image_url: '/tmp/south_park.jpg', categories: [cat])
+#end
 # Category.create(name: 'Comedies')
 # Category.create(name: 'Dramas')
+rev = Review.create(rating: 4, content: 'not too bad')
+rev2 = Review.create(rating: 3, content: 'pretty good')
+user = User.first
+user.reviews << rev
+user.reviews << rev2
+Video.all.each do |vid|
+  vid.reviews << rev
+  vid.reviews << rev2
+end

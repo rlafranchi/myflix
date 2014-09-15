@@ -16,6 +16,13 @@ describe VideosController do
         get :show, id: video.id
         response.should render_template :show
       end
+      it "sets @reviews variable" do
+        video = Fabricate(:video)
+        review1 = Fabricate(:review, video: video)
+        review2 = Fabricate(:review, video: video)
+        get :show, id: video.id
+        expect(assigns(:reviews)).to match_array([review1, review2])
+      end
     end
   end
   describe "POST search" do

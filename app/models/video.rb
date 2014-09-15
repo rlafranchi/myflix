@@ -1,6 +1,7 @@
 class Video < ActiveRecord::Base
   has_many :video_categories
   has_many :categories, through: :video_categories
+  has_many :reviews
   validates_presence_of :name, :description
 
   def self.search_by_name(str)
