@@ -14,25 +14,49 @@ describe SessionsController do
     end
   end
   describe "POST create" do
-    it "sets session user_id if authenticated" do
-      user = Fabricate(:user)
-      post :create, email: user.email, password: user.password
-      expect(session[:user_id]).to eq(user.id)
+    context "with valid credentials" do
+      before do
+        user = Fabricate(:user)
+        post :create, email: user.email, password: user.password
+      end
+      it "sets session user_id" do
+        expect(session[:user_id]).not_to be_nil
+      end
+      it "redirects to videos path" do
+        expect(response).to redirect_to videos_path
+      end
+      it "sets the notice" do
+        expect(flash[:success]).not_to be_blank
+      end
     end
-    it "redirects to login_path if not authenticated" do
-      user = Fabricate(:user)
-      post :create, password: 'wrongpass', email: user.email
-      expect(response).to redirect_to login_path
+    context "without valid credentials" do
+      before do
+        user = Fabricate(:user)
+        post :create, password: 'wrongpass', email: user.email
+      end
+      it "does not set session" do
+        expect(session[:user_id]).to be_nil
+      end
+      it "redirects to login_path if not authenticated" do
+        expect(response).to redirect_to login_path
+      end
+      it "sets error message" do
+        expect(flash[:warning]).not_to be_blank
+      end
     end
   end
   describe "GET destroy" do
-    it "sets session user_id to nil" do
+    before do
       get :destroy
+    end
+    it "sets session user_id to nil" do
       expect(session[:user_id]).to eq(nil)
     end
     it "redirects to root_path" do
-      get :destroy
       expect(response).to redirect_to root_path
+    end
+    it "sets flash notice" do
+      expect(flash[:warning]).not_to be_blank
     end
   end
 end
