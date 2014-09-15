@@ -13,8 +13,8 @@ class ApplicationController < ActionController::Base
   private
 
   def not_permitted
-    flash[:warning] = "Not Allowed!"
-    redirect_to root_path
+    flash[:warning] = "Please Log In"
+    redirect_to login_path
   end
 
   def require_user
