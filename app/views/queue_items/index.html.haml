@@ -17,7 +17,8 @@
             - @queue_items.each do |qitem|
               %tr
                 %td
-                  %form.form-control= qitem.list_order
+                  %form.form-control
+                    %input(name="list_order" value="#{qitem.list_order}")
                 %td
                   = link_to qitem.video.name, qitem.video
                 %td
