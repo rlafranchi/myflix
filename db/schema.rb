@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 20140918235443) do
     t.text     "content"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "rating"
+    t.integer  "rating"
   end
 
   create_table "users", force: true do |t|

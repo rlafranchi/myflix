@@ -16,6 +16,10 @@ class QueueItemsController < ApplicationController
     redirect_to my_queue_path
   end
 
+  def update_queue
+    binding.pry
+  end
+
   private
 
   def queue_video(video)
