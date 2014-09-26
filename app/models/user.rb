@@ -4,4 +4,18 @@ class User < ActiveRecord::Base
   has_secure_password validations: false
   has_many :reviews
   has_many :queue_items, -> { order("list_order ASC") }
+
+  def normalize_queue_items
+    queue_items.each_with_index do |qitem, i|
+      qitem.update_attributes(list_order: i + 1)
+    end
+  end
+
+  def new_qitem_order
+    queue_items.count + 1
+  end
+
+  def queued_video?(video)
+    queue_items.map(&:video).include?(video)
+  end
 end
