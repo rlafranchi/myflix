@@ -37,7 +37,7 @@ class QueueItemsController < ApplicationController
 
   def update_queue_items
     ActiveRecord::Base.transaction do
-      updated_params["up_queue_items"].each_with_index do |updated_qitem, index|
+      updated_params.each do |updated_qitem|
         qitem = QueueItem.find(updated_qitem["id"])
         qitem.update_attributes!(list_order: updated_qitem["list_order"]) if qitem.user == current_user
       end
@@ -45,7 +45,7 @@ class QueueItemsController < ApplicationController
   end
 
   def updated_params
-    params.permit!
+    params.permit![:up_queue_items]
   end
 
 end
