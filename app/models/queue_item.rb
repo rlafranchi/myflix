@@ -16,7 +16,7 @@ class QueueItem < ActiveRecord::Base
     category.name
   end
 
-  def queue_video(video)
-    create(video: video, user: current_user, list_order: current_user.new_qitem_order) unless current_user.queued_video?(video)
+  def self.queue_video(video)
+    self.create(video: video, user: User.current_user, list_order: User.current_user.new_qitem_order) unless User.current_user.queued_video?(video)
   end
 end

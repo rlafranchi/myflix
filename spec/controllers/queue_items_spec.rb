@@ -126,7 +126,9 @@ describe QueueItemsController do
       it "redirects back to my_queue" do
         user = Fabricate(:user)
         session[:user_id] = user.id
-        post :update_queue
+        qitem1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
+        qitem2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
+        post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2},{id: qitem2.id, list_order: 1}]
         expect(response).to redirect_to my_queue_path
       end
       it "saves new list_order to each queue_item" do
@@ -134,15 +136,15 @@ describe QueueItemsController do
         session[:user_id] = user.id
         qitem1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
         qitem2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
-        post :update_queue, queue_items: [{id: qitem1.id, list_order: 2},{id: qitem2.id, list_order: 1}]
-        expect(user.queue_items).to eq([qitem1,qitem2])
+        post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2},{id: qitem2.id, list_order: 1}]
+        expect(user.queue_items).to eq([qitem2,qitem1])
       end
       it "normalizes the position of the queue_items" do
         user = Fabricate(:user)
         session[:user_id] = user.id
         qitem1 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
         qitem2 = Fabricate(:queue_item, user_id: user.id, list_order: 3)
-        post :update_queue, queue_items: [{id: qitem1.id, list_order: 2},{id: qitem2.id, list_order: 1}]
+        post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2},{id: qitem2.id, list_order: 1}]
         expect(user.queue_items.map(&:list_order)).to eq([1, 2])
       end
     end
@@ -152,7 +154,7 @@ describe QueueItemsController do
         session[:user_id] = user.id
         qitem1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
         qitem2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
-        post :update_queue, queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
+        post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
         expect(flash).to be_truthy
       end
       it "redirects back to my_queue" do
@@ -160,7 +162,7 @@ describe QueueItemsController do
         session[:user_id] = user.id
         qitem1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
         qitem2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
-        post :update_queue, queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
+        post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
         expect(response).to redirect_to my_queue_path
       end
       it "does not save queue_item" do
@@ -168,14 +170,14 @@ describe QueueItemsController do
         session[:user_id] = user.id
         qitem1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
         qitem2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
-        post :update_queue, queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
+        post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
         expect(qitem1.reload.list_order).to eq(1)
         expect(qitem2.reload.list_order).to eq(2)
       end
     end
     context "with unauthenticated users" do
       it "redirects to login path" do
-        post :update_queue, queue_items: [{id: 4, list_order: 2.5},{id: 5, list_order: 1}]
+        post :update_queue, up_queue_items: [{id: 4, list_order: 2.5},{id: 5, list_order: 1}]
         expect(response).to redirect_to login_path
       end
     end
@@ -188,7 +190,7 @@ describe QueueItemsController do
         qitem1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
         qitem2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
         qitem3 = Fabricate(:queue_item, user_id: user2.id, list_order: 3)
-        post :update_queue, queue_items: [{id: qitem3.id, list_order: 2},{id: qitem2.id, list_order: 1}]
+        post :update_queue, up_queue_items: [{id: qitem3.id, list_order: 2},{id: qitem2.id, list_order: 1}]
         expect(response).to redirect_to my_queue_path
       end
       it "does not save other queue item" do
@@ -198,7 +200,7 @@ describe QueueItemsController do
         qitem1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
         qitem2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
         qitem3 = Fabricate(:queue_item, user_id: user2.id, list_order: 3)
-        post :update_queue, queue_items: [{id: qitem3.id, list_order: 2},{id: qitem2.id, list_order: 1}]
+        post :update_queue, up_queue_items: [{id: qitem3.id, list_order: 2},{id: qitem2.id, list_order: 1}]
         expect(qitem1.reload.list_order).to eq(1)
         expect(qitem2.reload.list_order).to eq(2)
         expect(qitem3.reload.list_order).to eq(3)

@@ -6,7 +6,7 @@ class QueueItemsController < ApplicationController
 
   def create
     video = Video.find(params[:video_id])
-    QueueItem.queue_video(video)
+    queue_video(video)
     redirect_to my_queue_path
   end
 
@@ -31,17 +31,21 @@ class QueueItemsController < ApplicationController
 
   private
 
-  def updated_params
-    params.permit("queue_items")
+  def queue_video(video)
+    QueueItem.create(video: video, user: current_user, list_order: current_user.new_qitem_order) unless current_user.queued_video?(video)
   end
 
   def update_queue_items
     ActiveRecord::Base.transaction do
-      updated_params.each do |updated_qitem|
+      updated_params["up_queue_items"].each_with_index do |updated_qitem, index|
         qitem = QueueItem.find(updated_qitem["id"])
         qitem.update_attributes!(list_order: updated_qitem["list_order"]) if qitem.user == current_user
       end
     end
+  end
+
+  def updated_params
+    params.permit!
   end
 
 end
