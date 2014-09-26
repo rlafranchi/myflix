@@ -3,6 +3,7 @@ class ReviewsController < ApplicationController
 
   def create
     @video = Video.find(params[:video_id])
+    review_params[:rating] = review_params["rating"[0].to_i]
     review = Review.new(review_params)
     review.user_id = current_user.id
     if review.save

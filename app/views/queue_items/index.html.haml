@@ -18,19 +18,14 @@
               - @queue_items.each do |qitem|
                 %tr
                   %td
-                    = hidden_field_tag "queue_items[][id]", qitem.id
-                    = text_field_tag "queue_items[][list_order]", qitem.list_order
+                    = hidden_field_tag "up_queue_items[][id]", qitem.id
+                    = text_field_tag "up_queue_items[][list_order]", qitem.list_order
                   %td
                     = link_to qitem.video.name, qitem.video
                   %td
                     = button_to "Play", nil, class: "btn btn-default"
                   %td
-                    %select.form-group(name="")
-                      %option(value="5") 5 Stars
-                      %option(value="4") 4 Stars
-                      %option(value="3") 3 Stars
-                      %option(value="2") 2 Stars
-                      %option(value="1") 1 Star
+                    = select_tag "up_queue_items[][rating]", options_for_select([5,4,3,2,1].map {|number| [pluralize(number, "Star")] }, pluralize(qitem.rating, "Star"))
                   %td
                     = link_to qitem.video_name, qitem.video
                   %td

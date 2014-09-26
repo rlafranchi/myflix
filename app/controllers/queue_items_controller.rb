@@ -39,7 +39,13 @@ class QueueItemsController < ApplicationController
     ActiveRecord::Base.transaction do
       updated_params.each do |updated_qitem|
         qitem = QueueItem.find(updated_qitem["id"])
-        qitem.update_attributes!(list_order: updated_qitem["list_order"]) if qitem.user == current_user
+        if qitem.user == current_user
+          qitem.update_attributes!(list_order: updated_qitem["list_order"])
+          unless qitem[:video_id].nil?
+            rev = Review.where(user_id: current_user.id, video_id: qitem.video.id).first
+            rev.update_attributes!(rating: updated_qitem["rating"])
+          end
+        end
       end
     end
   end

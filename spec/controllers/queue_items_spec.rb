@@ -147,6 +147,19 @@ describe QueueItemsController do
         post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2},{id: qitem2.id, list_order: 1}]
         expect(user.queue_items.map(&:list_order)).to eq([1, 2])
       end
+      it "updates rating" do
+        user = Fabricate(:user)
+        session[:user_id] = user.id
+        video = Fabricate(:video)
+        review1 = Fabricate(:review, user: user, video: video, rating: 1 )
+        video2 = Fabricate(:video)
+        review2 = Fabricate(:review, user: user, video: video2, rating: 1 )
+        qitem1 = Fabricate(:queue_item, video: video, user: user, list_order: 1 )
+        qitem2 = Fabricate(:queue_item, video: video2, user: user, list_order: 2 )
+        post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2, rating: 2},{id: qitem2.id, list_order: 1, rating: 4}]
+        expect(review2.reload.rating).to eq(4)
+        expect(review1.reload.rating).to eq(2)
+      end
     end
     context "with invalid input" do
       it "flashes error" do
