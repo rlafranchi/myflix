@@ -25,7 +25,7 @@
                   %td
                     = button_to "Play", nil, class: "btn btn-default"
                   %td
-                    = select_tag "up_queue_items[][rating]", options_for_select([5,4,3,2,1].map {|number| [pluralize(number, "Star")] }, pluralize(qitem.rating, "Star"))
+                    = select_tag "up_queue_items[][rating]", options_for_select([5,4,3,2,1].map {|number| [pluralize(number, "Star")] }, pluralize(qitem.rating, "Star")), include_blank: true
                   %td
                     = link_to qitem.video_name, qitem.video
                   %td
