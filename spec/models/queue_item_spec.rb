@@ -18,14 +18,41 @@ describe QueueItem do
       user = Fabricate(:user)
       review = Fabricate(:review, video: video, user: user, rating: 4 )
       qitem = Fabricate(:queue_item, video: video, user: user )
-      expect(qitem.rating).to eq(4)
+      expect(QueueItem.first.rating).to eq(4)
     end
     it "reutrns nil from the review when review is not present" do
       video = Fabricate(:video)
       user = Fabricate(:user)
       # review = Fabricate(:review, video: video, user: user, rating: 4 )
       qitem = Fabricate(:queue_item, video: video, user: user )
-      expect(qitem.rating).to eq(nil)
+      expect(QueueItem.first.rating).to eq(nil)
+    end
+  end
+
+  describe "#rating=" do
+    it "changes rating of the review if it is present" do
+      video = Fabricate(:video)
+      user = Fabricate(:user)
+      review = Fabricate(:review, user: user, video: video, rating: 4)
+      qitem = Fabricate(:queue_item, user: user, video: video )
+      qitem.rating = 3
+      expect(Review.first.rating).to eq(3)
+    end
+    it "clears rating of the review if not present" do
+      video = Fabricate(:video)
+      user = Fabricate(:user)
+      review = Fabricate(:review, user: user, video: video, rating: 4)
+      qitem = Fabricate(:queue_item, user: user, video: video )
+      qitem.rating = nil
+      expect(Review.first.rating).to be_nil
+    end
+    it "creates a review if no review is present" do
+      video = Fabricate(:video)
+      user = Fabricate(:user)
+      # review = Fabricate(:review, user: user, video: video, rating: 4)
+      qitem = Fabricate(:queue_item, user: user, video: video )
+      qitem.rating = 4
+      expect(Review.first.rating).to eq(4)
     end
   end
 

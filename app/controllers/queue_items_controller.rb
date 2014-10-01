@@ -41,10 +41,7 @@ class QueueItemsController < ApplicationController
         qitem = QueueItem.find(updated_qitem["id"])
         if qitem.user == current_user
           qitem.update_attributes!(list_order: updated_qitem["list_order"])
-          unless qitem[:video_id].nil?
-            rev = Review.where(user_id: current_user.id, video_id: qitem.video.id).first
-            rev.update_attributes!(rating: updated_qitem["rating"])
-          end
+          qitem.rating = updated_qitem["rating"]
         end
       end
     end
