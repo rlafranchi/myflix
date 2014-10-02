@@ -17,11 +17,8 @@ describe QueueItemsController do
         expect(assigns(:queue_items)).to eq(QueueItem.all.order("list_order"))
       end
     end
-    context "without authenticated user" do
-      it "redirects to login_path" do
-        get :index
-        expect(response).to redirect_to login_path
-      end
+    it_behaves_like "requires sign in" do
+      let(:action) { get :index }
     end
   end
   describe "POST create" do
@@ -64,17 +61,11 @@ describe QueueItemsController do
           post :create, video_id: monk.id
           expect(QueueItem.count).to eq(1)
         end
-
       end
-#      context "without valid input" do
-#        it "renders index template"
-#      end
     end
-    context "without authenticated user" do
-      it "redirects to login_path" do
-        get :index
-        expect(response).to redirect_to login_path
-      end
+
+    it_behaves_like "requires sign in" do
+      let(:action) { post :create, video_id: 3 }
     end
   end
   describe "DELETE destroy" do
@@ -105,12 +96,9 @@ describe QueueItemsController do
         expect(QueueItem.all.map(&:list_order)).to eq([1,2])
       end
     end
-    context "unauthenticated" do
-      it "redirects to login path if unauthenticated" do
-        queue_item = Fabricate(:queue_item)
-        delete :destroy, id: queue_item.id
-        expect(response).to redirect_to login_path
-      end
+
+    it_behaves_like "requires sign in" do
+      let(:action) { delete :destroy, id: 3 }
     end
   end
   describe "POST update_queue" do
@@ -167,12 +155,11 @@ describe QueueItemsController do
         end
       end
     end
-    context "with unauthenticated users" do
-      it "redirects to login path" do
-        post :update_queue, up_queue_items: [{id: 4, list_order: 2.5},{id: 5, list_order: 1}]
-        expect(response).to redirect_to login_path
-      end
+
+    it_behaves_like "requires sign in" do
+      let(:action) { post :update_queue, up_queue_items: [{id: 4, list_order: 3},{id: 5, list_order: 1}] }
     end
+
     context "with queue items that do not belong to the current user" do
       let(:video) { Fabricate(:video) }
       let(:user) { current_user }
