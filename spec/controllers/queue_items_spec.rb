@@ -4,8 +4,8 @@ require 'pry'
 describe QueueItemsController do
   describe "GET index" do
     context "with authenticated user" do
-      let(:user) { Fabricate(:user) }
-      before { session[:user_id] = user.id }
+      let(:user) { current_user }
+      before { set_current_user }
       it "renders index template" do
         get :index
         expect(response).to render_template(:index)
@@ -26,10 +26,8 @@ describe QueueItemsController do
   end
   describe "POST create" do
     context "with authenticated user" do
-      let(:user) { Fabricate(:user) }
-      before do
-        session[:user_id] = user.id
-      end
+      let(:user) { current_user }
+      before { set_current_user }
       context "with valid input" do
         it "creates queue_item" do
           video = Fabricate(:video)
@@ -80,51 +78,47 @@ describe QueueItemsController do
     end
   end
   describe "DELETE destroy" do
-    it "should redirect to my_queue" do
-      user = Fabricate(:user)
-      session[:user_id] = user.id
-      queue_item = Fabricate(:queue_item)
-      delete :destroy, id: queue_item.id
-      expect(response).to redirect_to my_queue_path
+    context "authenticated" do
+      let(:user) { current_user }
+      before { set_current_user }
+      it "should redirect to my_queue" do
+        queue_item = Fabricate(:queue_item)
+        delete :destroy, id: queue_item.id
+        expect(response).to redirect_to my_queue_path
+      end
+      it "deletes queue_item" do
+        queue_item = Fabricate(:queue_item, user_id: user.id)
+        delete :destroy, id: queue_item.id
+        expect(QueueItem.count).to eq(0)
+      end
+      it "does not delete queue_item if current user doesn't own queue_item" do
+        user2 = Fabricate(:user)
+        queue_item = Fabricate(:queue_item, user_id: user2.id)
+        delete :destroy, id: queue_item.id
+        expect(QueueItem.count).to eq(1)
+      end
+      it "reorders queue_items" do
+        queue_item1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
+        queue_item2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
+        queue_item3 = Fabricate(:queue_item, user_id: user.id, list_order: 3)
+        delete :destroy, id: queue_item1.id
+        expect(QueueItem.all.map(&:list_order)).to eq([1,2])
+      end
     end
-    it "deletes queue_item" do
-      user = Fabricate(:user)
-      session[:user_id] = user.id
-      queue_item = Fabricate(:queue_item, user_id: user.id)
-      delete :destroy, id: queue_item.id
-      expect(QueueItem.count).to eq(0)
-    end
-    it "does not delete queue_item if current user doesn't own queue_item" do
-      user = Fabricate(:user)
-      user2 = Fabricate(:user)
-      session[:user_id] = user.id
-      queue_item = Fabricate(:queue_item, user_id: user2.id)
-      delete :destroy, id: queue_item.id
-      expect(QueueItem.count).to eq(1)
-    end
-    it "redirects to login path if unauthenticated" do
-      queue_item = Fabricate(:queue_item)
-      delete :destroy, id: queue_item.id
-      expect(response).to redirect_to login_path
-    end
-    it "reorders queue_items" do
-      user = Fabricate(:user)
-      session[:user_id] = user.id
-      queue_item1 = Fabricate(:queue_item, user_id: user.id, list_order: 1)
-      queue_item2 = Fabricate(:queue_item, user_id: user.id, list_order: 2)
-      queue_item3 = Fabricate(:queue_item, user_id: user.id, list_order: 3)
-      delete :destroy, id: queue_item1.id
-      expect(QueueItem.all.map(&:list_order)).to eq([1,2])
+    context "unauthenticated" do
+      it "redirects to login path if unauthenticated" do
+        queue_item = Fabricate(:queue_item)
+        delete :destroy, id: queue_item.id
+        expect(response).to redirect_to login_path
+      end
     end
   end
   describe "POST update_queue" do
     context "with authenticated users" do
+      let(:video) { Fabricate(:video) }
+      let(:user) { current_user }
+      before { set_current_user }
       context "with valid input" do
-        let(:video) { Fabricate(:video) }
-        let (:user) { Fabricate(:user) }
-        before do
-          session[:user_id] = user.id
-        end
         it "redirects back to my_queue" do
           qitem1 = Fabricate(:queue_item, user_id: user.id, video_id: video.id, list_order: 1)
           qitem2 = Fabricate(:queue_item, user_id: user.id, video_id: video.id, list_order: 2)
@@ -156,26 +150,17 @@ describe QueueItemsController do
         end
       end
       context "with invalid input" do
-        let(:video) { Fabricate(:video) }
-        let (:user) { Fabricate(:user) }
-        before do
-          session[:user_id] = user.id
-        end
+        let(:qitem1) { Fabricate(:queue_item, user_id: user.id, video_id: video.id, list_order: 1) }
+        let(:qitem2) { Fabricate(:queue_item, user_id: user.id, video_id: video.id, list_order: 2) }
         it "flashes error" do
-          qitem1 = Fabricate(:queue_item, user_id: user.id, video_id: video, list_order: 1)
-          qitem2 = Fabricate(:queue_item, user_id: user.id, video_id: video, list_order: 2)
           post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
           expect(flash).to be_truthy
         end
         it "redirects back to my_queue" do
-          qitem1 = Fabricate(:queue_item, user_id: user.id, video_id: video, list_order: 1)
-          qitem2 = Fabricate(:queue_item, user_id: user.id, video_id: video, list_order: 2)
           post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
           expect(response).to redirect_to my_queue_path
         end
         it "does not save queue_item" do
-          qitem1 = Fabricate(:queue_item, user_id: user.id, video_id: video, list_order: 1)
-          qitem2 = Fabricate(:queue_item, user_id: user.id, video_id: video, list_order: 2)
           post :update_queue, up_queue_items: [{id: qitem1.id, list_order: 2.5},{id: qitem2.id, list_order: 1}]
           expect(qitem1.reload.list_order).to eq(1)
           expect(qitem2.reload.list_order).to eq(2)
@@ -190,10 +175,10 @@ describe QueueItemsController do
     end
     context "with queue items that do not belong to the current user" do
       let(:video) { Fabricate(:video) }
+      let(:user) { current_user }
+      before { set_current_user }
       it "redirects back to" do
-        user = Fabricate(:user)
         user2 = Fabricate(:user)
-        session[:user_id] = user.id
         qitem1 = Fabricate(:queue_item, user_id: user.id, video_id: video.id, list_order: 1)
         qitem2 = Fabricate(:queue_item, user_id: user.id, video_id: video.id, list_order: 2)
         qitem3 = Fabricate(:queue_item, user_id: user2.id, video_id: video.id, list_order: 3)
@@ -201,9 +186,7 @@ describe QueueItemsController do
         expect(response).to redirect_to my_queue_path
       end
       it "does not save other queue item" do
-        user = Fabricate(:user)
         user2 = Fabricate(:user)
-        session[:user_id] = user.id
         qitem1 = Fabricate(:queue_item, user_id: user.id, video_id: video.id, list_order: 1)
         qitem2 = Fabricate(:queue_item, user_id: user.id, video_id: video.id, list_order: 2)
         qitem3 = Fabricate(:queue_item, user_id: user2.id, video_id: video.id, list_order: 3)

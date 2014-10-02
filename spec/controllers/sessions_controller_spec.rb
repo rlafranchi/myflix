@@ -7,8 +7,7 @@ describe SessionsController do
       response.should render_template :new
     end
     it "redirects to videos_path if already logged in" do
-      user = Fabricate(:user)
-      session[:user_id] = user.id
+      set_current_user
       get :new
       response.should redirect_to videos_path
     end
