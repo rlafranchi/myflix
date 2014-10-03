@@ -19,7 +19,7 @@
                 %tr
                   %td
                     = hidden_field_tag "up_queue_items[][id]", qitem.id
-                    = text_field_tag "up_queue_items[][list_order]", qitem.list_order
+                    = text_field_tag "up_queue_items[][list_order]", qitem.list_order, data: {video_id: qitem.video.id}
                   %td
                     = link_to qitem.video.name, qitem.video
                   %td
