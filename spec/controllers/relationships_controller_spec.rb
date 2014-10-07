@@ -47,4 +47,33 @@ describe RelationshipsController do
       let(:action) { delete :destroy, id: 4 }
     end
   end
+  describe "POST create" do
+    context "with authenticated users" do
+      let(:bob) { current_user }
+      before { set_current_user }
+      it "redirects to people page" do
+        alice = Fabricate(:user)
+        post :create, relationship: {leader_id: alice.id}
+        expect(response).to redirect_to people_path
+      end
+      it "creates relationship" do
+        alice = Fabricate(:user)
+        post :create, relationship: {leader_id: alice.id}
+        expect(Relationship.count).to eq(1)
+      end
+      it "does not create a reltionship if leader is current user" do
+        post :create, relationship: {leader_id: bob.id}
+        expect(Relationship.count).to eq(0)
+      end
+      it "does not creat a relationship if current user is already following the leader" do
+        alice = Fabricate(:user)
+        relationship = Fabricate(:relationship, follower: bob, leader: alice)
+        post :create, relationship: {leader_id: alice.id}
+        expect(Relationship.count).to eq(1)
+      end
+    end
+    it_behaves_like "requires sign in" do
+      let(:action) { post :create, id: 4 }
+    end
+  end
 end

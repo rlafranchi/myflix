@@ -34,6 +34,5 @@ describe User do
       user = Fabricate(:user)
       expect(user.queue_items_present?).to be false
     end
-
   end
 end
