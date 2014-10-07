@@ -1,0 +1,34 @@
+%section.my_queue.container
+  .row
+    .col-sm-10.col-sm-offset-1
+      %article
+        %header
+          %h2 My Queue
+        = form_tag update_queue_path do
+          %table.table
+            %thead
+              %tr
+                %th(width="10%") List Order
+                %th(width="30%") Video Title
+                %th(width="10%") Play
+                %th(width="20%") Rating
+                %th(width="15%") Genre
+                %th(width="15%") Remove
+            %tbody
+              - @queue_items.each do |qitem|
+                %tr
+                  %td
+                    = hidden_field_tag "up_queue_items[][id]", qitem.id
+                    = text_field_tag "up_queue_items[][list_order]", qitem.list_order, data: {video_id: qitem.video.id}
+                  %td
+                    = link_to qitem.video.name, qitem.video
+                  %td
+                    = button_to "Play", nil, class: "btn btn-default"
+                  %td
+                    = select_tag "up_queue_items[][rating]", options_for_select([5,4,3,2,1].map {|number| [pluralize(number, "Star")] }, pluralize(qitem.rating, "Star")), include_blank: true
+                  %td
+                    = link_to qitem.video_name, qitem.video
+                  %td
+                    = link_to qitem, method: :delete do
+                      %i.glyphicon.glyphicon-remove
+          = submit_tag "Update Instant Queue", class: "btn btn-default" if current_user.queue_items_present?
