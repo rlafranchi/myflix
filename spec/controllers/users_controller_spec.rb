@@ -39,4 +39,21 @@ describe UsersController do
       end
     end
   end
+  describe "GET show" do
+    context "with authenticated users" do
+      let(:bob) { Fabricate(:user) }
+      before { set_current_user }
+      it "renders show template" do
+        get :show, id: bob.id
+        expect(response).to render_template :show
+      end
+      it "sets @user variable" do
+        get :show, id: bob.id
+        expect(assigns(:user)).to eq(bob)
+      end
+    end
+    it_behaves_like "requires sign in" do
+      let(:action) { get :show, id: 3 }
+    end
+  end
 end

@@ -1,10 +1,13 @@
 Myflix::Application.routes.draw do
   root to: "pages#front"
   get '/register', to: 'users#new'
-  resources :users, only: [:create, :edit, :update]
+  resources :users, only: [:show, :create]
+  resources :relationships, only: [:create, :destroy]
+  get '/people', to: 'relationships#index'
   get '/login', to: 'sessions#new'
   post '/login', to: 'sessions#create'
   get '/logout', to: 'sessions#destroy'
+  resources :categories, only: [:show]
   resources :videos, only: [:index, :show] do
     collection do
       post :search, to: "videos#search"

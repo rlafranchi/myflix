@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :require_user, only: [:show]
+
   def new
     @user = User.new
   end
@@ -12,10 +14,8 @@ class UsersController < ApplicationController
     end
   end
 
-  def edit
-  end
-
-  def update
+  def show
+    @user = User.find(params[:id])
   end
 
   private

@@ -38,6 +38,6 @@
             %li.row
               .col-sm-2
                 %span Rating: #{rev.rating} / 5
-                %p by #{link_to rev.user.name}
+                %p by #{link_to rev.user.name, rev.user}
               .col-sm-8
                 %p #{rev.content}
