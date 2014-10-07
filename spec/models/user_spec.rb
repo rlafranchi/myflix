@@ -5,6 +5,7 @@ describe User do
   it { should validate_presence_of(:password) }
   it { should validate_presence_of(:name) }
   it { should have_many(:queue_items).order("list_order") }
+  it { should have_many(:reviews).order("created_at DESC")}
 
   describe "#queued_video?" do
     it "should return true when user adds video to queue" do

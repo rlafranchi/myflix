@@ -32,8 +32,6 @@ feature "User interacts with queue" do
 
   end
 
-  scenario ""
-
   def expect_video_in_queue(video)
     expect(page).to have_content video.name
   end
