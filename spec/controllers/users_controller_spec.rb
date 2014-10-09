@@ -39,19 +39,28 @@ describe UsersController do
       end
     end
     context "email sending" do
-      before do
-        post :create, user: Fabricate.attributes_for(:user)
+      context "valid input" do
+        after { ActionMailer::Base.deliveries.clear }
+        before do
+          post :create, user: Fabricate.attributes_for(:user)
+        end
+        it "sends email" do
+          ActionMailer::Base.deliveries.should_not be_empty
+        end
+        it "sends to recipient" do
+          message = ActionMailer::Base.deliveries.last
+          message.to.should eq([User.first.email])
+        end
+        it "has the right content" do
+          message = ActionMailer::Base.deliveries.last
+          message.body.should include(User.first.name)
+        end
       end
-      it "sends email" do
-        ActionMailer::Base.deliveries.should_not be_empty
-      end
-      it "sends to recipient" do
-        message = ActionMailer::Base.deliveries.last
-        message.to.should eq([User.first.email])
-      end
-      it "has the right content" do
-        message = ActionMailer::Base.deliveries.last
-        message.body.should include(User.first.name)
+      context "invalid input" do
+        it "does not send an email" do
+          post :create, user: {email: "", password: "", name: ""}
+          ActionMailer::Base.deliveries.should be_empty
+        end
       end
     end
   end
