@@ -35,4 +35,11 @@ describe User do
       expect(user.queue_items_present?).to be false
     end
   end
+
+  describe "#generate token" do
+    it "generates a token for the user" do
+      user = Fabricate(:user)
+      expect(user.token).to be_present
+    end
+  end
 end

@@ -20,4 +20,9 @@ Myflix::Application.routes.draw do
   get 'my_queue', to: "queue_items#index"
   resources :queue_items, only: [:create, :destroy]
   post '/update_queue', to: 'queue_items#update_queue'
+  get '/lost_password', to: 'passwords#new'
+  resources :passwords, only: [:create]
+  get '/password_confirmation', to: 'passwords#confirm'
+  resources :reset_passwords, only: [:show, :create]
+  get '/expired_token', to: 'reset_passwords#expired_token'
 end

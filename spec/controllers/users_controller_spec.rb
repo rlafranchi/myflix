@@ -38,6 +38,31 @@ describe UsersController do
         expect(assigns(:user)).to be_new_record
       end
     end
+    context "email sending" do
+      context "valid input" do
+        after { ActionMailer::Base.deliveries.clear }
+        before do
+          post :create, user: Fabricate.attributes_for(:user)
+        end
+        it "sends email" do
+          ActionMailer::Base.deliveries.should_not be_empty
+        end
+        it "sends to recipient" do
+          message = ActionMailer::Base.deliveries.last
+          message.to.should eq([User.first.email])
+        end
+        it "has the right content" do
+          message = ActionMailer::Base.deliveries.last
+          message.body.should include(User.first.name)
+        end
+      end
+      context "invalid input" do
+        it "does not send an email" do
+          post :create, user: {email: "", password: "", name: ""}
+          ActionMailer::Base.deliveries.should be_empty
+        end
+      end
+    end
   end
   describe "GET show" do
     context "with authenticated users" do
