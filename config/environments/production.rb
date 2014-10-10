@@ -27,4 +27,5 @@ Myflix::Application.configure do
     password:             ENV['GM_KEY_PASSWORD'],
     authentication:       'plain',
     enable_starttls_auto: true  }
+  config.action_mailer.default_url_options = { host: 'fast-harbor-5534.herokuapp.com' }
 end
