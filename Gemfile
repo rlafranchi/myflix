@@ -12,6 +12,8 @@ gem 'jquery-rails'
 gem 'bcrypt'
 gem 'fabrication'
 gem 'faker'
+gem 'sidekiq'
+gem 'unicorn'
 
 group :development do
   gem 'sqlite3'
@@ -25,7 +27,6 @@ end
 
 group :development, :test do
   gem 'rspec-rails', '2.99'
-  gem 'sidekiq'
 end
 
 group :test do
