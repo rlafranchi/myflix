@@ -1,0 +1,2 @@
+web: bundle exec unicorn -p $PORT -c ./config/unicorn.rb
+redis: redis-server /home/Users/rlafranchi/documents/redis-2.8.17/src/redis.conf
