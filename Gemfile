@@ -37,9 +37,12 @@ group :test do
   gem 'shoulda-matchers'
 end
 
-group :production do
+group :production, :staging do
   gem 'pg'
   gem 'rails_12factor'
-  gem "sentry-raven"
+end
+
+group :production do
+  gem 'sentry-raven'
 end
 
