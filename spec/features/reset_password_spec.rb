@@ -15,5 +15,6 @@ feature "User resets password" do
     fill_in :password, with: "new_password"
     click_button "Sign In"
     page.should have_content "Welcome, #{joe.name}"
+    clear_email
   end
 end

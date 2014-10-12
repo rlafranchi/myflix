@@ -1,0 +1,9 @@
+!!! 5
+%html(lang="en-US")
+  %head
+    %title MyFLiX - a video on demand service
+  %body
+    %p= @invitation.name
+    %p #{@user.name} has invited you to Myflix.
+    %p #{@invitation.message}
+    = link_to "Sign up", register_with_token_url(@invitation.token)
