@@ -13,7 +13,6 @@
      deployment = Paratrooper::Deploy.new("fast-harbor-5534") do |deploy|
        deploy.tag              = 'production'
        deploy.match_tag        = 'staging'
-       deploy.maintenance_mode = !ENV['NO_MAINTENANCE']
      end
 
      deployment.deploy
