@@ -22,6 +22,24 @@ describe UsersController do
       it "should redirect to the sign in page" do
         expect(response).to redirect_to login_path
       end
+      context "invitations" do
+        it "creates relationships between inviter and invitee with valid token" do
+          inviter = Fabricate(:user)
+          invitation = Fabricate(:invitation, user_id: inviter.id)
+          post :create, user: Fabricate.attributes_for(:user), invitation_token: invitation.token
+          expect(Relationship.count).to eq(2)
+        end
+        it "does not create relationship for invalid token" do
+          post :create, user: Fabricate.attributes_for(:user), invitation_token: '123abc'
+          expect(Relationship.count).to eq(0)
+        end
+        it "expires token upon creation" do
+          inviter = Fabricate(:user)
+          invitation = Fabricate(:invitation, user_id: inviter.id)
+          post :create, user: Fabricate.attributes_for(:user), invitation_token: invitation.token
+          expect(invitation.reload.token).to be_nil
+        end
+      end
     end
     context "with invalid input" do
       before do
@@ -79,6 +97,26 @@ describe UsersController do
     end
     it_behaves_like "requires sign in" do
       let(:action) { get :show, id: 3 }
+    end
+  end
+  describe "GET new_invitation_with_token" do
+    let(:invitation) { Fabricate(:invitation) }
+    context "valid token" do
+      before { get :new_invitation_with_token, token: invitation.token }
+      it "renders new template" do
+        expect(response).to render_template :new
+      end
+      it "sets @user with name and email from invitation" do
+        expect(assigns(:user).email).to eq(invitation.email)
+        expect(assigns(:user).name).to eq(invitation.name)
+      end
+      it "sets @invitation_token" do
+        expect(assigns(:invitation_token)).to eq(invitation.token)
+      end
+    end
+    it "redirects to expired token path with invalid token" do
+      get :new_invitation_with_token, token: 'abc123'
+      expect(response).to redirect_to expired_token_path
     end
   end
 end

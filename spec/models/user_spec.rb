@@ -8,6 +8,7 @@ describe User do
   it { should have_many(:reviews).order("created_at DESC")}
   it { should have_many(:following_relationships) }
   it { should have_many(:leading_relationships) }
+  it { should have_many(:invitations) }
 
   describe "#queued_video?" do
     it "should return true when user adds video to queue" do

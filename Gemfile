@@ -12,6 +12,8 @@ gem 'jquery-rails'
 gem 'bcrypt'
 gem 'fabrication'
 gem 'faker'
+gem 'sidekiq'
+gem 'unicorn'
 
 group :development do
   gem 'sqlite3'
@@ -29,6 +31,7 @@ end
 
 group :test do
   gem 'capybara'
+  gem 'capybara-email'
   gem 'launchy'
   gem 'database_cleaner', '1.2.0'
   gem 'shoulda-matchers'
