@@ -25,6 +25,7 @@ end
 
 group :development, :test do
   gem 'rspec-rails', '2.99'
+  gem 'sidekiq'
 end
 
 group :test do

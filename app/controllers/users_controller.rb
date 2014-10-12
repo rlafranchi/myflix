@@ -26,7 +26,7 @@ class UsersController < ApplicationController
         invitation.token = nil
         invitation.save
       end
-      AppMailer.send_welcome_email(@user).deliver
+      AppMailer.delay.send_welcome_email(@user)
       redirect_to login_path
     else
       render :new
