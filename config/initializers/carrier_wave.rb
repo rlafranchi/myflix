@@ -9,7 +9,7 @@ CarrierWave.configure do |config|
     }
     config.fog_directory  = 'myflix-rich'
     config.fog_public     = false
-    config_fog_attributes = {'Cache-Control'=>"max-age=#{365.day.to_i}"}
+    config.fog_attributes = {'Cache-Control'=>"max-age=#{365.day.to_i}"}
 
   else
     config.storage = :file
