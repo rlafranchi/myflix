@@ -18,6 +18,7 @@ gem 'paratrooper'
 gem 'carrierwave'
 gem 'mini_magick'
 gem 'fog', '~> 1.20', require: 'fog/aws/storage'
+gem 'stripe'
 
 group :development do
   gem 'sqlite3'

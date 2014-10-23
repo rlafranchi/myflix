@@ -26,8 +26,20 @@ class UsersController < ApplicationController
         invitation.token = nil
         invitation.save
       end
-      AppMailer.delay.send_welcome_email(@user)
-      redirect_to login_path
+
+      begin
+        charge = Stripe::Charge.create(
+          :amount => 999,
+          :currency => "usd",
+          :card => stripe_token_param,
+          :description => "MyFlix payment for #{@user.email}"
+        )
+        AppMailer.delay.send_welcome_email(@user)
+        redirect_to login_path
+      rescue Stripe::CardError => e
+        flash[:error] = e.message
+        redirect_to register_path
+      end
     else
       render :new
     end
@@ -45,5 +57,9 @@ class UsersController < ApplicationController
 
   def token_param
     params[:invitation_token]
+  end
+
+  def stripe_token_param
+    params[:stripeToken]
   end
 end
