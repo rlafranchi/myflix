@@ -18,19 +18,11 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
-    invitation = Invitation.find_by(token: token_param)
     if @user.save
-      if invitation
-        Relationship.create({leader: invitation.user, follower: @user})
-        Relationship.create({leader: @user, follower: invitation.user})
-        invitation.token = nil
-        invitation.save
-      end
-
+      handle_invitation
       begin
-        charge = Stripe::Charge.create(
+        charge = StripeWrapper::Charge.create(
           :amount => 999,
-          :currency => "usd",
           :card => stripe_token_param,
           :description => "MyFlix payment for #{@user.email}"
         )
@@ -62,4 +54,15 @@ class UsersController < ApplicationController
   def stripe_token_param
     params[:stripeToken]
   end
+
+  def handle_invitation
+    invitation = Invitation.find_by(token: token_param)
+    if invitation
+      Relationship.create({leader: invitation.user, follower: @user})
+      Relationship.create({leader: @user, follower: invitation.user})
+      invitation.token = nil
+      invitation.save
+    end
+  end
+
 end
