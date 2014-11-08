@@ -1,9 +1,9 @@
 feature "User interacts with social networking" do
   scenario "appropriate followers show on people page" do
     comedies = Fabricate(:category, name: "Comedies")
-    south_park = Fabricate(:video, name: "South Park", small_image_url: '/tmp/south_park.jpg', category: comedies)
-    family_guy = Fabricate(:video, name: "Family Guy", small_image_url: '/tmp/family_guy.jpg', category: comedies)
-    futurama = Fabricate(:video, name: "Futuram", small_image_url: '/tmp/futurama.jpg', category: comedies)
+    south_park = Fabricate(:video, name: "South Park", small_cover: '/tmp/south_park.jpg', category: comedies)
+    family_guy = Fabricate(:video, name: "Family Guy", small_cover: '/tmp/family_guy.jpg', category: comedies)
+    futurama = Fabricate(:video, name: "Futuram", small_cover: '/tmp/futurama.jpg', category: comedies)
     bob = Fabricate(:user)
     review = Fabricate(:review, user: bob, video: futurama, rating: 5, content: "good")
     user = Fabricate(:user)

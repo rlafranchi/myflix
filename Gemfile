@@ -15,6 +15,10 @@ gem 'faker'
 gem 'sidekiq'
 gem 'unicorn'
 gem 'paratrooper'
+gem 'carrierwave'
+gem 'mini_magick'
+gem 'fog', '~> 1.20', require: 'fog/aws/storage'
+gem 'stripe'
 
 group :development do
   gem 'sqlite3'
@@ -36,6 +40,9 @@ group :test do
   gem 'launchy'
   gem 'database_cleaner', '1.2.0'
   gem 'shoulda-matchers'
+  gem 'webmock'
+  gem 'vcr'
+  gem 'selenium-webdriver'
 end
 
 group :production, :staging do

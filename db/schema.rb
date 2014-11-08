@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141011223043) do
+ActiveRecord::Schema.define(version: 20141021134024) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(version: 20141011223043) do
     t.datetime "updated_at"
     t.string   "password_digest"
     t.string   "token"
+    t.boolean  "admin"
   end
 
   create_table "video_categories", force: true do |t|
@@ -73,11 +74,12 @@ ActiveRecord::Schema.define(version: 20141011223043) do
   create_table "videos", force: true do |t|
     t.string   "name"
     t.text     "description"
-    t.string   "small_image_url"
-    t.string   "large_image_url"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "category_id"
+    t.string   "large_cover"
+    t.string   "small_cover"
+    t.string   "video_url"
   end
 
 end

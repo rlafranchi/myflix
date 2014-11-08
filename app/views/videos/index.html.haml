@@ -6,4 +6,4 @@
         - cat.recent_videos.each do |video|
           .video.col-sm-2
             = link_to video_path(video), nil do
-              %img(src="#{video.small_image_url}" alt="#{video.name}")
+              %img(src="#{video.small_cover.url}" alt="#{video.name}")

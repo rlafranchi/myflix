@@ -1,7 +1,13 @@
+- content_for :head do
+  = javascript_include_tag "https://js.stripe.com/v2/", "stripe"
+  :javascript
+    Stripe.setPublishableKey("#{ENV['STRIPE_PUBLISHABLE_KEY']}");
+
 %section.register.container
   .row
     .col-sm-10.col-sm-offset-1
-      = bootstrap_form_for @user, html: {class: "form-horizontal"} do |f|
+      = bootstrap_form_for @user, html: {class: 'form-horizontal', id: 'payment-form'} do |f|
+        %span.payment-errors
         %header
           %h1 Register
         %fieldset
@@ -9,6 +15,23 @@
           = f.password_field :password, label: "Password"
           = f.text_field :name, label: "Name"
           = hidden_field_tag :invitation_token, @invitation_token
+        %fieldset.credit_card
+          .form-group
+            %label.control-label.col-sm-2(for="credit-card") Credit Card Number
+            .col-sm-6
+              %input.form-control.card-number(type="text" size="20" data-stripe="number" id="credit-card")
+          .form-group
+            %label.control-label.col-sm-2(for="cvc") Security Code
+            .col-sm-6
+              %input.form-control.security-code(type="text" size="4" data-stripe="cvc" id="cvc")
+          .form-group
+            %label.control-label.col-sm-2(for="expiration-month") Expiration Month
+            .col-sm-3
+              = select_month(Date.today, {add_month_numbers: true},  class: 'form-control expiration-month', id: 'expiration-month', data: {stripe: 'exp-month'})
+          .form-group
+            %label.control-label.col-sm-2(for="expiration-year") Expiration Year
+            .col-sm-2
+              = select_year(Date.today.year, {start_year: Date.today.year, end_year: Date.today.year + 4}, class: 'form-control expiration-year', id: 'expiration-year', data: {stripe: 'exp-year'})
         %fieldset.actions.control-group.col-sm-offset-2
           .controls
-            %input(type="submit" value="Sign Up" class="btn btn-default")
+            %button.btn.btn-primary(type='submit') Register
