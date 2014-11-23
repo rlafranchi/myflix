@@ -18,24 +18,12 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
-    if @user.valid?
-      charge = StripeWrapper::Charge.create(
-        :amount => 999,
-        :card => stripe_token_param,
-        :description => "MyFlix payment for #{@user.email}"
-      )
-      if charge.successful?
-        @user.save
-        handle_invitation
-        AppMailer.delay.send_welcome_email(@user)
-        flash[:success] = 'Thank You for signing up! Please sign in.';
-        redirect_to login_path
-      else
-        flash[:error] = charge.error_message
-        render :new
-      end
+    result = UserSignup.new(@user).sign_up(stripe_token_param, token_param)
+    if result.successful?
+      flash[:success] = "Thank You for signing up! Please sign in."
+      redirect_to login_path
     else
-      flash[:error] = 'Invalid user information.';
+      flash[:error] = result.error_message
       render :new
     end
   end
@@ -56,16 +44,6 @@ class UsersController < ApplicationController
 
   def stripe_token_param
     params[:stripeToken]
-  end
-
-  def handle_invitation
-    invitation = Invitation.find_by(token: token_param)
-    if invitation
-      Relationship.create({leader: invitation.user, follower: @user})
-      Relationship.create({leader: @user, follower: invitation.user})
-      invitation.token = nil
-      invitation.save
-    end
   end
 
 end

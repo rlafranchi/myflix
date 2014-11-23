@@ -10,16 +10,4 @@ class Video < ActiveRecord::Base
     return [] if str.blank?
     where("name LIKE ?", "%#{str}%").order("created_at DESC")
   end
-
-  def average_rating
-    sum = 0.0
-    reviews.all.each do |rev|
-      sum += rev.rating.to_i
-    end
-    if reviews.count != 0
-      (sum.to_f / reviews.all.count.to_f).round(1)
-    else
-      " - "
-    end
-  end
 end

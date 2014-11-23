@@ -12,101 +12,26 @@ describe UsersController do
     end
   end
   describe "POST create" do
-    context "with valid user info and valid card" do
-      let(:charge) { double(:charge, successful?: true) }
-      before do
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
-        post :create, user: Fabricate.attributes_for(:user), stripeToken: '12341234'
-      end
-      it "should create the user" do
-        expect(User.count).to eq(1)
-      end
+    context "succesful user sign up" do
       it "should redirect to the sign in page" do
+        result = double(:sign_up_result, successful?: true, error_message: "error")
+        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
+        post :create, user: Fabricate.attributes_for(:user)
         expect(response).to redirect_to login_path
       end
-      context "invitations" do
-        let(:charge) { double(:charge, successful?: true) }
-        before do
-          StripeWrapper::Charge.should_receive(:create).and_return(charge)
-        end
-        it "creates relationships between inviter and invitee with valid token" do
-          inviter = Fabricate(:user)
-          invitation = Fabricate(:invitation, user_id: inviter.id)
-          post :create, user: Fabricate.attributes_for(:user), invitation_token: invitation.token, stripeToken: '12341234'
-          expect(Relationship.count).to eq(2)
-        end
-        it "does not create relationship for invalid token" do
-          post :create, user: Fabricate.attributes_for(:user), invitation_token: '123abc',  stripeToken: '12341234'
-          expect(Relationship.count).to eq(0)
-        end
-        it "expires token upon creation" do
-          inviter = Fabricate(:user)
-          invitation = Fabricate(:invitation, user_id: inviter.id)
-          post :create, user: Fabricate.attributes_for(:user), invitation_token: invitation.token,  stripeToken: '12341234'
-          expect(invitation.reload.token).to be_nil
-        end
-      end
     end
-    context "with valid user info and declined card" do
-      let(:charge) { double(:charge, successful?: false, error_message: 'Your card was declined.') }
-      before do
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
-        post :create, user: Fabricate.attributes_for(:user), stripeToken: '12341234'
-      end
-      it "does not create user" do
-        expect(User.count).to eq(0)
-      end
+    context "failed user sign up" do
       it "renders new template" do
+        result = double(:sign_up_result, successful?: false, error_message: "error")
+        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
+        post :create, user: Fabricate.attributes_for(:user)
         expect(response).to render_template :new
       end
       it "flashes error" do
+        result = double(:sign_up_result, successful?: false, error_message: "error")
+        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
+        post :create, user: Fabricate.attributes_for(:user)
         expect(flash[:error]).to be_present
-      end
-    end
-    context "with invalid user info input and valid card" do
-      let(:charge) { double(:charge, successful?: true) }
-      before do
-        post :create, user: { email: "", password: "password", name: "Name", stripeToken: '12341234' }
-      end
-      it "does not create the user" do
-        expect(User.count).to eq(0)
-      end
-      it "render the :new template" do
-        expect(response).to render_template :new
-      end
-      it "sets the @user variable" do
-        expect(assigns(:user)).to be_instance_of(User)
-        expect(assigns(:user)).to be_new_record
-      end
-      it "does not charge card" do
-        StripeWrapper::Charge.should_not_receive(:create)
-      end
-    end
-    context "email sending" do
-      context "valid input" do
-        let(:charge) { double(:charge, successful?: true) }
-        after { ActionMailer::Base.deliveries.clear }
-        before do
-          StripeWrapper::Charge.should_receive(:create).and_return(charge)
-          post :create, user: Fabricate.attributes_for(:user), stripeToken: '12341234'
-        end
-        it "sends email" do
-          ActionMailer::Base.deliveries.should_not be_empty
-        end
-        it "sends to recipient" do
-          message = ActionMailer::Base.deliveries.last
-          message.to.should eq([User.first.email])
-        end
-        it "has the right content" do
-          message = ActionMailer::Base.deliveries.last
-          message.body.should include(User.first.name)
-        end
-      end
-      context "invalid input" do
-        it "does not send an email" do
-          post :create, user: {email: "", password: "", name: ""}
-          ActionMailer::Base.deliveries.should be_empty
-        end
       end
     end
   end
