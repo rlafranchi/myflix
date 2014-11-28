@@ -86,5 +86,13 @@ describe StripeWrapper do
         )
       expect(response.error_message).to be_present
     end
+    it "returns a customer token", :vcr do
+bob = Fabricate(:user)
+      response = StripeWrapper::Customer.create(
+          user: bob,
+          card: valid_token
+        )
+      expect(response.customer_token).to be_present
+    end
   end
 end

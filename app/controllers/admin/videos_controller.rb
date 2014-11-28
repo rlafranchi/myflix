@@ -1,7 +1,4 @@
-class Admin::VideosController < ApplicationController
-  before_action :require_user
-  before_action :require_admin
-
+class Admin::VideosController < AdminsController
   def new
     @video = Video.new
   end
@@ -19,11 +16,6 @@ class Admin::VideosController < ApplicationController
   end
 
   private
-
-  def require_admin
-    flash[:error] = "You do not have administrative privileges." unless current_user.admin?
-    redirect_to root_path unless current_user.admin?
-  end
 
   def video_params
     params.require(:video).permit(:name, :description, :category_id, :small_cover, :large_cover, :video_url)

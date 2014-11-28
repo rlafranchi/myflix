@@ -3,13 +3,17 @@ require 'spec_helper'
 describe UserSignup do
   describe "#sign_up" do
     context "with valid user info and valid card" do
-      let(:customer) { double(:customer, successful?: true) }
+      let(:customer) { double(:customer, successful?: true, customer_token: "abcdefg") }
       before do
         StripeWrapper::Customer.should_receive(:create).and_return(customer)
       end
       it "should create the user" do
         UserSignup.new(Fabricate.build(:user)).sign_up("some_token", nil)
         expect(User.count).to eq(1)
+      end
+      it "stores customer token" do
+        UserSignup.new(Fabricate.build(:user)).sign_up("some_token", nil)
+        expect(User.first.customer_token).to eq(customer.customer_token)
       end
       it "creates relationships between inviter and invitee with valid token" do
         inviter = Fabricate(:user)
@@ -29,7 +33,7 @@ describe UserSignup do
       end
     end
     context "with valid user info and declined card" do
-      let(:customer) { double(:customer, successful?: false, error_message: 'Your card was declined.') }
+      let(:customer) { double(:customer, successful?: false, error_message: 'Your card was declined.', customer_token: "abcdefg") }
       before do
         StripeWrapper::Customer.should_receive(:create).and_return(customer)
         UserSignup.new(Fabricate.build(:user)).sign_up("some_token", nil)
@@ -39,7 +43,7 @@ describe UserSignup do
       end
     end
     context "with invalid user info input and valid card" do
-      let(:customer) { double(:customer, successful?: true) }
+      let(:customer) { double(:customer, successful?: true, customer_token: "abcdefg") }
       before do
         UserSignup.new(Fabricate.build(:user, email: "", password: "password", name: "Name")).sign_up("some_token", nil)
       end
@@ -52,7 +56,7 @@ describe UserSignup do
     end
     context "email sending" do
       context "valid input" do
-        let(:customer) { double(:customer, successful?: true) }
+        let(:customer) { double(:customer, successful?: true, customer_token: "abcdefg") }
         after { ActionMailer::Base.deliveries.clear }
         before do
           StripeWrapper::Customer.should_receive(:create).and_return(customer)

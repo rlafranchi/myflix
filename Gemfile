@@ -20,6 +20,7 @@ gem 'mini_magick'
 gem 'fog', '~> 1.20', require: 'fog/aws/storage'
 gem 'stripe'
 gem 'draper'
+gem 'stripe_event'
 
 group :development do
   gem 'sqlite3'
