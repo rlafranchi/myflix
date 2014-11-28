@@ -3,9 +3,9 @@ require 'spec_helper'
 describe UserSignup do
   describe "#sign_up" do
     context "with valid user info and valid card" do
-      let(:charge) { double(:charge, successful?: true) }
+      let(:customer) { double(:customer, successful?: true) }
       before do
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
+        StripeWrapper::Customer.should_receive(:create).and_return(customer)
       end
       it "should create the user" do
         UserSignup.new(Fabricate.build(:user)).sign_up("some_token", nil)
@@ -29,9 +29,9 @@ describe UserSignup do
       end
     end
     context "with valid user info and declined card" do
-      let(:charge) { double(:charge, successful?: false, error_message: 'Your card was declined.') }
+      let(:customer) { double(:customer, successful?: false, error_message: 'Your card was declined.') }
       before do
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
+        StripeWrapper::Customer.should_receive(:create).and_return(customer)
         UserSignup.new(Fabricate.build(:user)).sign_up("some_token", nil)
       end
       it "does not create user" do
@@ -39,7 +39,7 @@ describe UserSignup do
       end
     end
     context "with invalid user info input and valid card" do
-      let(:charge) { double(:charge, successful?: true) }
+      let(:customer) { double(:customer, successful?: true) }
       before do
         UserSignup.new(Fabricate.build(:user, email: "", password: "password", name: "Name")).sign_up("some_token", nil)
       end
@@ -47,15 +47,15 @@ describe UserSignup do
         expect(User.count).to eq(0)
       end
       it "does not charge card" do
-        StripeWrapper::Charge.should_not_receive(:create)
+        StripeWrapper::Customer.should_not_receive(:create)
       end
     end
     context "email sending" do
       context "valid input" do
-        let(:charge) { double(:charge, successful?: true) }
+        let(:customer) { double(:customer, successful?: true) }
         after { ActionMailer::Base.deliveries.clear }
         before do
-          StripeWrapper::Charge.should_receive(:create).and_return(charge)
+          StripeWrapper::Customer.should_receive(:create).and_return(customer)
           UserSignup.new(Fabricate.build(:user)).sign_up("some_token", nil)
         end
         it "sends email" do

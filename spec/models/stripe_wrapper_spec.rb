@@ -41,4 +41,50 @@ describe StripeWrapper do
       end
     end
   end
+  describe StripeWrapper::Customer do
+    let(:valid_token) do
+      Stripe::Token.create(
+        card: {
+            number: "4242424242424242",
+            exp_month: 12,
+            exp_year: 2015,
+            cvc: 123
+          }
+        ).id
+    end
+    let(:declined_token) do
+      Stripe::Token.create(
+        card: {
+            number: "4000000000000002",
+            exp_month: 12,
+            exp_year: 2015,
+            cvc: 123
+          }
+        ).id
+    end
+    it "creates a customer on successful charge", :vcr do
+      bob = Fabricate(:user)
+      response = StripeWrapper::Customer.create(
+          user: bob,
+          card: valid_token
+        )
+      expect(response).to be_successful
+    end
+    it "does not create a customer on failed charge", :vcr do
+      bob = Fabricate(:user)
+      response = StripeWrapper::Customer.create(
+          user: bob,
+          card: declined_token
+        )
+      expect(response).to_not be_successful
+    end
+    it "sets error message on failed charge", :vcr do
+      bob = Fabricate(:user)
+      response = StripeWrapper::Customer.create(
+          user: bob,
+          card: declined_token
+        )
+      expect(response.error_message).to be_present
+    end
+  end
 end
