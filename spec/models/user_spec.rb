@@ -43,4 +43,12 @@ describe User do
       expect(user.token).to be_present
     end
   end
+
+  describe "#deactivate!" do
+    it "returns false" do
+      user = Fabricate(:user)
+      user.deactivate!
+      expect(user.active?).to be false
+    end
+  end
 end
